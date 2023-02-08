@@ -61,6 +61,20 @@ namespace GitCredentialManager.Tests.Objects
 
         public void Stop(int exitCode, string fileName, int lineNumber) { }
 
+        public void ChildStart(DateTimeOffset startTime,
+            Trace2ProcessClass processClass,
+            bool useShell,
+            string argv,
+            string filePath = "",
+            int lineNumber = 0) { }
+
+        public void ChildExit(
+            double elapsedTime,
+            int pid,
+            int code,
+            string filePath = "",
+            int lineNumber = 0) { }
+
         #endregion
 
         #region IDisposable

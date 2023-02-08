@@ -11,6 +11,7 @@ public class ChildProcess : DisposableObject
 
     private DateTimeOffset _startTime;
     private DateTimeOffset _exitTime => Process.ExitTime;
+    private ProcessStartInfo _startInfo => Process.StartInfo;
 
     private int _id => Process.Id;
 
@@ -21,10 +22,10 @@ public class ChildProcess : DisposableObject
     public int Id => Process.Id;
     public int ExitCode => Process.ExitCode;
 
-    public static ChildProcess Start(ITrace2 trace2, ProcessStartInfo startInfo)
+    public static ChildProcess Start(ITrace2 trace2, ProcessStartInfo startInfo, Trace2ProcessClass processClass)
     {
         var childProc = new ChildProcess(trace2, startInfo);
-        childProc.Start();
+        childProc.Start(processClass);
         return childProc;
     }
 
@@ -35,7 +36,7 @@ public class ChildProcess : DisposableObject
         Process.Exited += ProcessOnExited;
     }
 
-    public void Start()
+    public void Start(Trace2ProcessClass processClass)
     {
         ThrowIfDisposed();
         // Record the time just before the process starts, since:
@@ -45,7 +46,7 @@ public class ChildProcess : DisposableObject
         // variable is passed to Trace2.
         _startTime = DateTimeOffset.UtcNow;
         Process.Start();
-        _trace2.ChildStart(_startTime);
+        _trace2.ChildStart(_startTime, processClass, _startInfo.UseShellExecute, _startInfo.Arguments);
     }
 
     public void WaitForExit() => Process.WaitForExit();

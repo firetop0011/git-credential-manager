@@ -23,7 +23,26 @@ public enum Trace2Event
     [EnumMember(Value = "start")]
     Start = 1,
     [EnumMember(Value = "exit")]
-    Exit = 2
+    Exit = 2,
+    [EnumMember(Value = "child_start")]
+    ChildStart = 3,
+    [EnumMember(Value = "child_exit")]
+    ChildExit = 4
+}
+
+/// <summary>
+/// Classifications of processes invoked by GCM.
+/// </summary>
+public enum Trace2ProcessClass
+{
+    [EnumMember(Value = "none")]
+    None = 0,
+    [EnumMember(Value = "ui_helper")]
+    UIHelper = 1,
+    [EnumMember(Value = "git")]
+    Git = 2,
+    [EnumMember(Value = "operating_system")]
+    OperatingSystem = 3
 }
 
 public class Trace2Settings
@@ -65,6 +84,41 @@ public interface ITrace2 : IDisposable
     void Stop(int exitCode,
         [System.Runtime.CompilerServices.CallerFilePath] string filePath = "",
         [System.Runtime.CompilerServices.CallerLineNumber] int lineNumber = 0);
+
+    /// <summary>
+    /// Writes information related to startup of child process to trace writer.
+    /// </summary>
+    /// <param name="startTime"></param>
+    /// <param name="processClass">Process classification.</param>
+    /// <param name="useShell">Specifies whether or not OS shell was used to start the process.</param>
+    /// <param name="argv">Arguments specific to the child process.</param>
+    /// <param name="filePath">Path of the file this method is called from.</param>
+    /// <param name="lineNumber">Line number of file this method is called from.</param>
+    void ChildStart(DateTimeOffset startTime,
+        Trace2ProcessClass processClass,
+        bool useShell,
+        string argv,
+        [System.Runtime.CompilerServices.CallerFilePath]
+        string filePath = "",
+        [System.Runtime.CompilerServices.CallerLineNumber]
+        int lineNumber = 0);
+
+    /// <summary>
+    /// Writes information related to exit of child process to trace writer.
+    /// </summary>
+    /// <param name="elapsedTime">Runtime of child process.</param>
+    /// <param name="pid">Id of exiting process.</param>
+    /// <param name="code">Process exit code.</param>
+    /// <param name="filePath">Path of the file this method is called from.</param>
+    /// <param name="lineNumber">Line number of file this method is called from.</param>
+    void ChildExit(
+        double elapsedTime,
+        int pid,
+        int code,
+        [System.Runtime.CompilerServices.CallerFilePath]
+        string filePath = "",
+        [System.Runtime.CompilerServices.CallerLineNumber]
+        int lineNumber = 0);
 }
 
 public class Trace2 : DisposableObject, ITrace2
@@ -79,6 +133,10 @@ public class Trace2 : DisposableObject, ITrace2
     private List<string> _argv;
     private DateTimeOffset _applicationStartTime;
     private string _sid;
+    private string _appPath = "";
+
+    // Incrementing id to assign to child processes.
+    public int ChildProcCounter { get; set; } = 0;
 
     public Trace2(IEnvironment environment, List<string> argv, DateTimeOffset applicationStartTime)
     {
@@ -112,6 +170,59 @@ public class Trace2 : DisposableObject, ITrace2
     {
         WriteExit(exitCode, filePath, lineNumber);
         ReleaseManagedResources();
+    }
+
+    public void ChildStart(DateTimeOffset startTime,
+        Trace2ProcessClass processClass,
+        bool useShell,
+        string argv,
+        string filePath = "",
+        int lineNumber = 0)
+    {
+        var processArgs = new List<string>()
+        {
+            _appPath
+        };
+
+        // If the process has arguments, append them to the args used to invoke GCM.
+        if (!string.IsNullOrEmpty(argv))
+        {
+            processArgs.AddRange(argv.Split(" "));
+        }
+
+        WriteMessage(new ChildStartMessage()
+        {
+            Event = Trace2Event.ChildStart,
+            Sid = _sid,
+            Time = startTime,
+            File = Path.GetFileName(filePath).ToLower(),
+            Line = lineNumber,
+            Id = ++ChildProcCounter,
+            Classification = processClass,
+            UseShell = useShell,
+            Argv = processArgs
+        });
+    }
+
+    public void ChildExit(
+        double elapsedTime,
+        int pid,
+        int code,
+        string filePath = "",
+        int lineNumber = 0)
+    {
+        WriteMessage(new ChildExitMessage()
+        {
+            Event = Trace2Event.ChildExit,
+            Sid = _sid,
+            Time = DateTimeOffset.UtcNow,
+            File = Path.GetFileName(filePath).ToLower(),
+            Line = lineNumber,
+            Id = ChildProcCounter,
+            Pid = pid,
+            Code = code,
+            ElapsedTime = elapsedTime
+        });
     }
 
     protected override void ReleaseManagedResources()
@@ -412,5 +523,65 @@ public class ExitMessage : Trace2Message
     public override string ToNormalString()
     {
         return BuildNormalString($"elapsed:{ElapsedTime} code:{Code}");
+    }
+}
+
+public class ChildStartMessage : Trace2Message
+{
+    [JsonProperty("child_id", Order = 7)]
+    public long Id { get; set; }
+
+    [JsonProperty("child_class", Order = 8)]
+    public Trace2ProcessClass Classification { get; set; }
+
+    [JsonProperty("use_shell", Order = 9)]
+    public bool UseShell { get; set; }
+
+    [JsonProperty("argv", Order = 10)]
+    public IList<string> Argv { get; set; }
+
+    public override string ToJson()
+    {
+        return JsonConvert.SerializeObject(this,
+            new StringEnumConverter(),
+            new IsoDateTimeConverter()
+            {
+                DateTimeFormat = TimeFormat
+            });
+    }
+
+    public override string ToNormalString()
+    {
+        return BuildNormalString($"[{Id}] {string.Join(" ", Argv)}");
+    }
+}
+
+public class ChildExitMessage : Trace2Message
+{
+    [JsonProperty("child_id", Order = 7)]
+    public long Id { get; set; }
+
+    [JsonProperty("pid", Order = 8)]
+    public int Pid { get; set; }
+
+    [JsonProperty("code", Order = 9)]
+    public int Code { get; set; }
+
+    [JsonProperty("t_rel", Order = 10)]
+    public double ElapsedTime { get; set; }
+
+    public override string ToJson()
+    {
+        return JsonConvert.SerializeObject(this,
+            new StringEnumConverter(),
+            new IsoDateTimeConverter()
+            {
+                DateTimeFormat = TimeFormat
+            });
+    }
+
+    public override string ToNormalString()
+    {
+        return BuildNormalString($"[{Id}] pid:{Pid} code:{Code} elapsed:{ElapsedTime}");
     }
 }
