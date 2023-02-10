@@ -10,8 +10,8 @@ namespace GitCredentialManager.Diagnostics
     {
         private readonly IFileSystem _fs;
 
-        public FileSystemDiagnostic(IFileSystem fs)
-            : base("File system")
+        public FileSystemDiagnostic(IFileSystem fs, ITrace2 trace2)
+            : base("File system", trace2)
         {
             EnsureArgument.NotNull(fs, nameof(fs));
 

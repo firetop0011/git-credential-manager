@@ -9,8 +9,8 @@ namespace GitCredentialManager.Diagnostics
     {
         private readonly IGit _git;
 
-        public GitDiagnostic(IGit git)
-            : base("Git")
+        public GitDiagnostic(IGit git, ITrace2 trace2)
+            : base("Git", trace2)
         {
             EnsureArgument.NotNull(git, nameof(git));
 
@@ -30,7 +30,7 @@ namespace GitCredentialManager.Diagnostics
             log.AppendLine(thisRepo is null ? "Not inside a Git repository." : $"Git repository at '{thisRepo}'");
 
             log.Append("Listing all Git configuration...");
-            Process configProc = _git.CreateProcess("config --list --show-origin");
+            ChildProcess configProc = _git.CreateProcess("config --list --show-origin");
             configProc.Start();
             // To avoid deadlocks, always read the output stream first and then wait
             // TODO: don't read in all the data at once; stream it

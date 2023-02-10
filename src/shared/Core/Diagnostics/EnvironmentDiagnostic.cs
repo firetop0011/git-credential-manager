@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,8 +11,8 @@ namespace GitCredentialManager.Diagnostics
     {
         private readonly IEnvironment _env;
 
-        public EnvironmentDiagnostic(IEnvironment env)
-            : base("Environment")
+        public EnvironmentDiagnostic(IEnvironment env, ITrace2 trace2)
+            : base("Environment", trace2)
         {
             EnsureArgument.NotNull(env, nameof(env));
 
@@ -20,7 +21,7 @@ namespace GitCredentialManager.Diagnostics
 
         protected override Task<bool> RunInternalAsync(StringBuilder log, IList<string> additionalFiles)
         {
-            PlatformInformation platformInfo = PlatformUtils.GetPlatformInformation();
+            PlatformInformation platformInfo = PlatformUtils.GetPlatformInformation(Trace2);
             log.AppendLine($"OSType: {platformInfo.OperatingSystemType}");
             log.AppendLine($"OSVersion: {platformInfo.OperatingSystemVersion}");
 

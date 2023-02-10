@@ -33,7 +33,10 @@ namespace GitCredentialManager
         /// <param name="command">Command to execute.</param>
         /// <param name="workingDirectory">Optional working directory.</param>
         /// <returns><see cref="Process"/> object ready to start.</returns>
-        public static Process CreateWslProcess(string distribution, string command, string workingDirectory = null)
+        public static ChildProcess CreateWslProcess(string distribution,
+            string command,
+            ITrace2 trace2,
+            string workingDirectory = null)
         {
             var args = new StringBuilder();
             args.AppendFormat("--distribution {0} ", distribution);
@@ -50,7 +53,7 @@ namespace GitCredentialManager
                 WorkingDirectory = workingDirectory ?? string.Empty
             };
 
-            return new Process { StartInfo = psi };
+            return new ChildProcess(trace2, psi);
         }
 
         public static string ConvertToDistroPath(string path, out string distribution)

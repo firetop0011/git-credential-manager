@@ -18,7 +18,7 @@ namespace GitCredentialManager
         /// </summary>
         /// <param name="args">Arguments to pass to the Git process.</param>
         /// <returns>Process object ready to be started.</returns>
-        Process CreateProcess(string args);
+        ChildProcess CreateProcess(string args);
 
         /// <summary>
         /// Return the path to the current repository, or null if this instance is not
@@ -121,8 +121,6 @@ namespace GitCredentialManager
             using (var git = CreateProcess("rev-parse --absolute-git-dir"))
             {
                 git.Start();
-                // To avoid deadlocks, always read the output stream first and then wait
-                // TODO: don't read in all the data at once; stream it
                 string data = git.StandardOutput.ReadToEnd();
                 git.WaitForExit();
 
@@ -184,7 +182,7 @@ namespace GitCredentialManager
             }
         }
 
-        public Process CreateProcess(string args)
+        public ChildProcess CreateProcess(string args)
         {
             return _procManager.CreateProcess(_gitPath, args, false, _workingDirectory);
         }
@@ -238,7 +236,7 @@ namespace GitCredentialManager
             return resultDict;
         }
 
-        public static GitException CreateGitException(Process git, string message)
+        public static GitException CreateGitException(ChildProcess git, string message)
         {
             string gitMessage = git.StandardError.ReadToEnd();
             throw new GitException(message, gitMessage, git.ExitCode);

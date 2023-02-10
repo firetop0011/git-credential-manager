@@ -16,8 +16,11 @@ namespace GitCredentialManager.Diagnostics
 
     public abstract class Diagnostic : IDiagnostic
     {
-        protected Diagnostic(string name)
+        protected readonly ITrace2 Trace2;
+
+        protected Diagnostic(string name, ITrace2 trace2)
         {
+            Trace2 = trace2;
             Name = name;
         }
 

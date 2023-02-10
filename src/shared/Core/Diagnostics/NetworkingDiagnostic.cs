@@ -15,8 +15,8 @@ namespace GitCredentialManager.Diagnostics
         private const string TestHttpUri = "http://example.com";
         private const string TestHttpsUri = "https://example.com";
 
-        public NetworkingDiagnostic(IHttpClientFactory httpFactory)
-            : base("Networking")
+        public NetworkingDiagnostic(IHttpClientFactory httpFactory, ITrace2 trace2)
+            : base("Networking", trace2)
         {
             EnsureArgument.NotNull(httpFactory, nameof(httpFactory));
 

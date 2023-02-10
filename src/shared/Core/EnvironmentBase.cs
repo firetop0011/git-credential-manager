@@ -66,8 +66,6 @@ namespace GitCredentialManager
 
         public IReadOnlyDictionary<string, string> Variables { get; protected set; }
 
-        protected ITrace Trace { get; }
-
         protected IFileSystem FileSystem { get; }
 
         public bool IsDirectoryOnPath(string directoryPath)

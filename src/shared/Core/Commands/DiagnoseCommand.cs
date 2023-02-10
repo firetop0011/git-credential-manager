@@ -26,11 +26,11 @@ namespace GitCredentialManager.Commands
             _diagnostics = new List<IDiagnostic>
             {
                 // Add standard diagnostics
-                new EnvironmentDiagnostic(context.Environment),
-                new FileSystemDiagnostic(context.FileSystem),
-                new NetworkingDiagnostic(context.HttpClientFactory),
-                new GitDiagnostic(context.Git),
-                new CredentialStoreDiagnostic(context.CredentialStore),
+                new EnvironmentDiagnostic(context.Environment, context.Trace2),
+                new FileSystemDiagnostic(context.FileSystem, context.Trace2),
+                new NetworkingDiagnostic(context.HttpClientFactory, context.Trace2),
+                new GitDiagnostic(context.Git, context.Trace2),
+                new CredentialStoreDiagnostic(context.CredentialStore, context.Trace2),
                 new MicrosoftAuthenticationDiagnostic(context)
             };
 

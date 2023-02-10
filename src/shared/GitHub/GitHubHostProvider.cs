@@ -302,9 +302,9 @@ namespace GitHub
             base.ReleaseManagedResources();
         }
 
-        public IEnumerable<IDiagnostic> GetDiagnostics()
+        public IEnumerable<IDiagnostic> GetDiagnostics(ITrace2 trace2)
         {
-            yield return new GitHubApiDiagnostic(_gitHubApi);
+            yield return new GitHubApiDiagnostic(_gitHubApi, trace2);
         }
 
         #region Private Methods

@@ -1,13 +1,14 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using GitCredentialManager.Tests.Objects;
+using Moq;
 
 namespace GitCredentialManager.Tests;
 
 public class TestProcessManager : IProcessManager
 {
-    public IList<ProcessStartInfo> CreatedProcesses { get; set; } = new List<ProcessStartInfo>();
-
-    public Process CreateProcess(string path, string args, bool useShellExecute, string workingDirectory)
+    public ChildProcess CreateProcess(string path, string args, bool useShellExecute, string workingDirectory)
     {
         var psi = new ProcessStartInfo(path, args)
         {
@@ -18,8 +19,6 @@ public class TestProcessManager : IProcessManager
             WorkingDirectory = workingDirectory ?? string.Empty
         };
 
-        CreatedProcesses.Add(psi);
-
-        return new Process { StartInfo = psi };
+        return new ChildProcess(new NullTrace2(), psi);
     }
 }

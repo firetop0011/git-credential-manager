@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using GitCredentialManager;
 using GitCredentialManager.Diagnostics;
 
 namespace GitHub.Diagnostics
@@ -10,8 +11,8 @@ namespace GitHub.Diagnostics
     {
         private readonly IGitHubRestApi _api;
 
-        public GitHubApiDiagnostic(IGitHubRestApi api)
-            : base("GitHub API")
+        public GitHubApiDiagnostic(IGitHubRestApi api, ITrace2 trace2)
+            : base("GitHub API", trace2)
         {
             _api = api;
         }

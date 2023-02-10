@@ -12,7 +12,7 @@ namespace GitCredentialManager.Diagnostics
         private readonly ICommandContext _context;
 
         public MicrosoftAuthenticationDiagnostic(ICommandContext context)
-            : base("Microsoft authentication (AAD/MSA)")
+            : base("Microsoft authentication (AAD/MSA)", context.Trace2)
         {
             EnsureArgument.NotNull(context, nameof(context));
 

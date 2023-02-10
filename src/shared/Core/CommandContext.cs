@@ -156,8 +156,7 @@ namespace GitCredentialManager
                 throw new PlatformNotSupportedException();
             }
 
-            Trace2 = new Trace2(Environment, Settings.GetTrace2Settings(), argv, applicationStartTime);
-            HttpClientFactory = new HttpClientFactory(FileSystem, Trace, Settings, Streams);
+            HttpClientFactory = new HttpClientFactory(FileSystem, Trace, Trace2, Settings, Streams);
             CredentialStore   = new CredentialStore(this);
         }
 

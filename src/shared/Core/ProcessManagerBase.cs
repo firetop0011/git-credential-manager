@@ -10,16 +10,23 @@ public interface IProcessManager
     /// <param name="path">Absolute file path of executable or command to start.</param>
     /// <param name="args">Command line arguments to pass to executable.</param>
     /// <param name="useShellExecute">
-    /// True to resolve <paramref name="path"/> using the OS shell, false to use as an absolute file path.
+    ///     True to resolve <paramref name="path"/> using the OS shell, false to use as an absolute file path.
     /// </param>
     /// <param name="workingDirectory">Working directory for the new process.</param>
     /// <returns><see cref="Process"/> object ready to start.</returns>
-    Process CreateProcess(string path, string args, bool useShellExecute, string workingDirectory);
+    ChildProcess CreateProcess(string path, string args, bool useShellExecute, string workingDirectory);
 }
 
 public class ProcessManagerBase : IProcessManager
 {
-    public virtual Process CreateProcess(string path, string args, bool useShellExecute, string workingDirectory)
+    private readonly ITrace2 _trace2;
+
+    public ProcessManagerBase(ITrace2 trace2)
+    {
+        _trace2 = trace2;
+    }
+
+    public virtual ChildProcess CreateProcess(string path, string args, bool useShellExecute, string workingDirectory)
     {
         var psi = new ProcessStartInfo(path, args)
         {
@@ -30,6 +37,6 @@ public class ProcessManagerBase : IProcessManager
             WorkingDirectory = workingDirectory ?? string.Empty
         };
 
-        return new Process { StartInfo = psi };
+        return new ChildProcess(_trace2, psi);
     }
 }

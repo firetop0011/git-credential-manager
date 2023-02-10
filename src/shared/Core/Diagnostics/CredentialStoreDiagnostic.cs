@@ -9,8 +9,8 @@ namespace GitCredentialManager.Diagnostics
     {
         private readonly ICredentialStore _credentialStore;
 
-        public CredentialStoreDiagnostic(ICredentialStore credentialStore)
-            : base("Credential storage")
+        public CredentialStoreDiagnostic(ICredentialStore credentialStore, ITrace2 trace2)
+            : base("Credential storage", trace2)
         {
             EnsureArgument.NotNull(credentialStore, nameof(credentialStore));
 

@@ -4,6 +4,6 @@ namespace GitCredentialManager.Diagnostics
 {
     public interface IDiagnosticProvider
     {
-        IEnumerable<IDiagnostic> GetDiagnostics();
+        IEnumerable<IDiagnostic> GetDiagnostics(ITrace2 trace2);
     }
 }

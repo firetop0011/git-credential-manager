@@ -60,7 +60,7 @@ namespace GitCredentialManager
             // If the provider exposes custom diagnostics use them
             if (provider is IDiagnosticProvider diagnosticProvider)
             {
-                IEnumerable<IDiagnostic> providerDiagnostics = diagnosticProvider.GetDiagnostics();
+                IEnumerable<IDiagnostic> providerDiagnostics = diagnosticProvider.GetDiagnostics(Context.Trace2);
                 _diagnostics.AddRange(providerDiagnostics);
             }
         }
@@ -91,7 +91,7 @@ namespace GitCredentialManager
             }
 
             // Trace the current version, OS, runtime, and program arguments
-            PlatformInformation info = PlatformUtils.GetPlatformInformation();
+            PlatformInformation info = PlatformUtils.GetPlatformInformation(Context.Trace2);
             Context.Trace.WriteLine($"Version: {Constants.GcmVersion}");
             Context.Trace.WriteLine($"Runtime: {info.ClrVersion}");
             Context.Trace.WriteLine($"Platform: {info.OperatingSystemType} ({info.CpuArchitecture})");
