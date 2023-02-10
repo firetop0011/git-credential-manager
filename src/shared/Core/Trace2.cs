@@ -41,16 +41,20 @@ public interface ITrace2 : IDisposable
     /// Initialize TRACE2 tracing by setting up any configured target formats and
     /// writing Version and Start events.
     /// </summary>
+    /// <param name="settings">The TRACE2 environment/config settings.</param>
     /// <param name="error">The standard error text stream connected back to the calling process.</param>
     /// <param name="fileSystem">File system abstraction.</param>
     /// <param name="appPath">The path to the GCM application.</param>
     /// <param name="filePath">Path of the file this method is called from.</param>
     /// <param name="lineNumber">Line number of file this method is called from.</param>
-    void Start(TextWriter error,
+    void Start(Trace2Settings settings,
+        TextWriter error,
         IFileSystem fileSystem,
         string appPath,
-        [System.Runtime.CompilerServices.CallerFilePath] string filePath = "",
-        [System.Runtime.CompilerServices.CallerLineNumber] int lineNumber = 0);
+        [System.Runtime.CompilerServices.CallerFilePath]
+        string filePath = "",
+        [System.Runtime.CompilerServices.CallerLineNumber]
+        int lineNumber = 0);
 
     /// <summary>
     /// Shut down TRACE2 tracing by writing Exit event and disposing of writers.
@@ -72,28 +76,27 @@ public class Trace2 : DisposableObject, ITrace2
 
     private List<ITrace2Writer> _writers = new List<ITrace2Writer>();
     private IEnvironment _environment;
-    private Trace2Settings _settings;
     private string[] _argv;
     private DateTimeOffset _applicationStartTime;
     private string _sid;
 
-    public Trace2(IEnvironment environment, Trace2Settings settings, string[] argv, DateTimeOffset applicationStartTime)
+    public Trace2(IEnvironment environment, string[] argv, DateTimeOffset applicationStartTime)
     {
         _environment = environment;
-        _settings = settings;
         _argv = argv;
         _applicationStartTime = applicationStartTime;
 
         _sid = SetSid();
     }
 
-    public void Start(TextWriter error,
+    public void Start(Trace2Settings settings,
+        TextWriter error,
         IFileSystem fileSystem,
         string appPath,
         string filePath,
         int lineNumber)
     {
-        TryParseSettings(error, fileSystem);
+        TryParseSettings(settings, error, fileSystem);
 
         if (!AssemblyUtils.TryGetAssemblyVersion(out string version))
         {
@@ -167,10 +170,10 @@ public class Trace2 : DisposableObject, ITrace2
         return false;
     }
 
-    private void TryParseSettings(TextWriter error, IFileSystem fileSystem)
+    private void TryParseSettings(Trace2Settings settings, TextWriter error, IFileSystem fileSystem)
     {
         // Set up the correct writer for every enabled format target.
-        foreach (var formatTarget in _settings.FormatTargetsAndValues)
+        foreach (var formatTarget in settings.FormatTargetsAndValues)
         {
             if (TryGetPipeName(formatTarget.Value, out string name)) // Write to named pipe/socket
             {

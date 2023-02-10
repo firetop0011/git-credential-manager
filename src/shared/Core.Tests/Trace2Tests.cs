@@ -16,7 +16,7 @@ public class Trace2Tests
         var environment = new TestEnvironment();
         var settings = new TestSettings();
 
-        var trace2 = new Trace2(environment, settings.GetTrace2Settings(), new []{""}, DateTimeOffset.UtcNow);
+        var trace2 = new Trace2(environment, new []{""}, DateTimeOffset.UtcNow);
         var isSuccessful = trace2.TryGetPipeName(input, out var actual);
 
         Assert.True(isSuccessful);
@@ -32,7 +32,7 @@ public class Trace2Tests
         var environment = new TestEnvironment();
         var settings = new TestSettings();
 
-        var trace2 = new Trace2(environment, settings.GetTrace2Settings(), new []{""}, DateTimeOffset.UtcNow);
+        var trace2 = new Trace2(environment, new []{""}, DateTimeOffset.UtcNow);
         var isSuccessful = trace2.TryGetPipeName(input, out var actual);
 
         Assert.True(isSuccessful);
@@ -50,7 +50,7 @@ public class Trace2Tests
         environment.Variables.Add("GIT_TRACE2_PARENT_SID", parentSid);
 
         var settings = new TestSettings();
-        var trace2 = new Trace2(environment, settings.GetTrace2Settings(), new []{""}, DateTimeOffset.UtcNow);
+        var trace2 = new Trace2(environment, new []{""}, DateTimeOffset.UtcNow);
         var sid = trace2.SetSid();
 
         Assert.Matches(rx, sid);

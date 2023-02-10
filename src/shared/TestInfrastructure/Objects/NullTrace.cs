@@ -53,7 +53,7 @@ namespace GitCredentialManager.Tests.Objects
         #region ITrace2
         public void AddWriter(ITrace2Writer writer) { }
 
-        public void Start(TextWriter error,
+        public void Start(Trace2Settings settings, TextWriter error,
             IFileSystem fileSystem,
             string appPath,
             string filePath = "",

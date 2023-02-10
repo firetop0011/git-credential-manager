@@ -78,7 +78,7 @@ namespace GitCredentialManager
             }
 
             // Enable TRACE2 tracing
-            Context.Trace2.Start(Context.Streams.Error, Context.FileSystem, Context.ApplicationPath);
+            Context.Trace2.Start(Context.Settings.GetTrace2Settings(), Context.Streams.Error, Context.FileSystem, Context.ApplicationPath);
 
             return RunInternalAsync(args);
         }

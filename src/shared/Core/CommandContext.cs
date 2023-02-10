@@ -104,7 +104,8 @@ namespace GitCredentialManager
                 FileSystem        = new WindowsFileSystem();
                 SessionManager    = new WindowsSessionManager();
                 Environment       = new WindowsEnvironment(FileSystem);
-                ProcessManager    = new WindowsProcessManager();
+                Trace2            = new Trace2(Environment, argv, applicationStartTime);
+                ProcessManager    = new WindowsProcessManager(Trace2);
                 Terminal          = new WindowsTerminal(Trace);
                 string gitPath    = GetGitPath(Environment, FileSystem, Trace);
                 Git               = new GitProcess(
@@ -120,7 +121,8 @@ namespace GitCredentialManager
                 FileSystem        = new MacOSFileSystem();
                 SessionManager    = new MacOSSessionManager();
                 Environment       = new MacOSEnvironment(FileSystem);
-                ProcessManager    = new PosixProcessManager();
+                Trace2            = new Trace2(Environment, argv, applicationStartTime);
+                ProcessManager    = new WindowsProcessManager(Trace2);
                 Terminal          = new MacOSTerminal(Trace);
                 string gitPath    = GetGitPath(Environment, FileSystem, Trace);
                 Git               = new GitProcess(
@@ -137,7 +139,8 @@ namespace GitCredentialManager
                 // TODO: support more than just 'Posix' or X11
                 SessionManager    = new PosixSessionManager();
                 Environment       = new PosixEnvironment(FileSystem);
-                ProcessManager    = new PosixProcessManager();
+                Trace2            = new Trace2(Environment, argv, applicationStartTime);
+                ProcessManager    = new WindowsProcessManager(Trace2);
                 Terminal          = new LinuxTerminal(Trace);
                 string gitPath    = GetGitPath(Environment, FileSystem, Trace);
                 Git               = new GitProcess(
