@@ -40,6 +40,8 @@ namespace GitCredentialManager.Tests.Objects
         public TestGit Git { get; set; }
         public TestEnvironment Environment { get; set; }
 
+        public IProcessManager ProcessManager { get; set; }
+
         #region ICommandContext
 
         string ICommandContext.ApplicationPath
