@@ -76,11 +76,11 @@ public class Trace2 : DisposableObject, ITrace2
 
     private List<ITrace2Writer> _writers = new List<ITrace2Writer>();
     private IEnvironment _environment;
-    private string[] _argv;
+    private List<string> _argv;
     private DateTimeOffset _applicationStartTime;
     private string _sid;
 
-    public Trace2(IEnvironment environment, string[] argv, DateTimeOffset applicationStartTime)
+    public Trace2(IEnvironment environment, List<string> argv, DateTimeOffset applicationStartTime)
     {
         _environment = environment;
         _argv = argv;
@@ -230,12 +230,8 @@ public class Trace2 : DisposableObject, ITrace2
         string filePath,
         int lineNumber)
     {
-        // Prepend GCM exe to arguments
-        var argv = new List<string>()
-        {
-            Path.GetFileName(appPath),
-        };
-        argv.AddRange(_argv);
+        // Prepend GCM exe to existing arguments
+        _argv = _argv.Prepend(appPath).ToList();
 
         WriteMessage(new StartMessage()
         {
@@ -244,7 +240,7 @@ public class Trace2 : DisposableObject, ITrace2
             Time = DateTimeOffset.UtcNow,
             File = Path.GetFileName(filePath).ToLower(),
             Line = lineNumber,
-            Argv = argv,
+            Argv = _argv,
             ElapsedTime = (DateTimeOffset.UtcNow - _applicationStartTime).TotalSeconds
         });
     }

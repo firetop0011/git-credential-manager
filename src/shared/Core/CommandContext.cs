@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using GitCredentialManager.Interop.Linux;
 using GitCredentialManager.Interop.MacOS;
 using GitCredentialManager.Interop.Posix;
@@ -104,7 +105,7 @@ namespace GitCredentialManager
                 FileSystem        = new WindowsFileSystem();
                 SessionManager    = new WindowsSessionManager();
                 Environment       = new WindowsEnvironment(FileSystem);
-                Trace2            = new Trace2(Environment, argv, applicationStartTime);
+                Trace2            = new Trace2(Environment, argv.ToList(), applicationStartTime);
                 ProcessManager    = new WindowsProcessManager(Trace2);
                 Terminal          = new WindowsTerminal(Trace);
                 string gitPath    = GetGitPath(Environment, FileSystem, Trace);
@@ -121,7 +122,7 @@ namespace GitCredentialManager
                 FileSystem        = new MacOSFileSystem();
                 SessionManager    = new MacOSSessionManager();
                 Environment       = new MacOSEnvironment(FileSystem);
-                Trace2            = new Trace2(Environment, argv, applicationStartTime);
+                Trace2            = new Trace2(Environment, argv.ToList(), applicationStartTime);
                 ProcessManager    = new WindowsProcessManager(Trace2);
                 Terminal          = new MacOSTerminal(Trace);
                 string gitPath    = GetGitPath(Environment, FileSystem, Trace);
@@ -139,7 +140,7 @@ namespace GitCredentialManager
                 // TODO: support more than just 'Posix' or X11
                 SessionManager    = new PosixSessionManager();
                 Environment       = new PosixEnvironment(FileSystem);
-                Trace2            = new Trace2(Environment, argv, applicationStartTime);
+                Trace2            = new Trace2(Environment, argv.ToList(), applicationStartTime);
                 ProcessManager    = new WindowsProcessManager(Trace2);
                 Terminal          = new LinuxTerminal(Trace);
                 string gitPath    = GetGitPath(Environment, FileSystem, Trace);
